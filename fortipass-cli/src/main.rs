@@ -25,5 +25,5 @@ fn main() {
     let pass_manager = PasswordManager::new(&key);
 
     let my_pass = get_passwords(&pass_manager);
-    println!("{:?}", my_pass.iter().next().unwrap());
+    println!("{:?}", my_pass.iter().next().unwrap().password);
 }
