@@ -1,7 +1,7 @@
 target/
 Cargo.lock
 
-*.key
+*.bin
 
 .vscode/
 .idea/

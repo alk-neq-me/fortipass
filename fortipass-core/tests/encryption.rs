@@ -26,7 +26,7 @@ mod tests {
 
     #[test]
     fn read_key_file() {
-        let key_path = Path::new("../fish.key");
+        let key_path = Path::new("../key.bin");
 
         let key_manager = KeyManager::new();
         let key = key_manager.read_file(&key_path).unwrap();
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn read_encrypted_data() {
-        let key_path = Path::new("../fish.key");
+        let key_path = Path::new("../key.bin");
 
         let key_manager = KeyManager::new();
         let key = key_manager.read_file(&key_path).unwrap();
