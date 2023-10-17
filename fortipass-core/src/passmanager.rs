@@ -1,30 +1,56 @@
-use std::io;
-use std::path::Path;
 use crypto::aes::KeySize;
 use crypto::buffer::{WriteBuffer, ReadBuffer, BufferResult};
 use crypto::symmetriccipher::SymmetricCipherError;
 
-use crate::utils::{RwManager, Encryption};
+use crate::models::{Password, EncryptedPassword};
+use crate::utils::Encryption;
 
-pub struct PasswordManager;
 
-impl RwManager for PasswordManager {
-    fn read_file(&self, path: &Path) -> Result<[u8;32], io::Error> {
-        if !path.is_file() {
-            return Err(io::Error::from(io::ErrorKind::NotFound))
+
+
+pub struct PasswordManager<'a> {
+    pub key: &'a [u8],
+    pub value: Option<Password>
+}
+
+impl<'a> PasswordManager<'a> {
+    pub fn new(key: &'a [u8]) -> PasswordManager<'a> {
+        PasswordManager {
+            key,
+            value: None
         }
-        Ok([0u8;32])
-    }
-
-    fn create_file(&self, _: &Path) -> Result<(), io::Error> {
-        Ok(())
     }
 }
 
 
-impl Encryption for PasswordManager {
-    fn encrypt(&self, key: &[u8], data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
-        let mut encryptor = crypto::aes::cbc_encryptor(KeySize::KeySize256, key, &[0u8; 16], crypto::blockmodes::PkcsPadding);
+impl<'a> PasswordManager<'a> {
+    pub fn read_data(&self, encrypted: &EncryptedPassword) -> Result<Password, SymmetricCipherError> {
+        let username = String::from_utf8(self.decrypt(&encrypted.username)?).expect("Failed username extract.");
+        let password = String::from_utf8(self.decrypt(&encrypted.password)?).expect("Failed password extract.");
+
+        let decrypted = Password::new(
+            &encrypted.site,
+            &username,
+            &password
+        );
+
+        Ok(decrypted)
+    }
+
+    pub fn set_password(&self, data: &Password) -> Result<EncryptedPassword, SymmetricCipherError> {
+        let username = self.encrypt(data.username.as_bytes())?;
+        let password = self.encrypt(data.password.as_bytes())?;
+
+        let encrypted = EncryptedPassword::new(&data.site, username, password);
+
+        Ok(encrypted)
+    }
+}
+
+
+impl<'a> Encryption for PasswordManager<'a> {
+    fn encrypt(&self, data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
+        let mut encryptor = crypto::aes::cbc_encryptor(KeySize::KeySize256, self.key, &[0u8; 16], crypto::blockmodes::PkcsPadding);
 
         let mut final_result = Vec::new();
         let mut read_buffer = crypto::buffer::RefReadBuffer::new(data);
@@ -44,10 +70,10 @@ impl Encryption for PasswordManager {
         Ok(final_result)
     }
 
-    fn decrypt(&self, key: &[u8], data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
+    fn decrypt(&self, data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
         let mut decryptor = crypto::aes::cbc_decryptor(
             KeySize::KeySize256,
-            key, 
+            self.key, 
             &[0u8; 16], 
             crypto::blockmodes::PkcsPadding
         );

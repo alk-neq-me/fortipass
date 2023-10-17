@@ -5,21 +5,27 @@ use std::io;
 use std::fs;
 use std::io::Read;
 use std::path::Path;
-
 use rand::Rng;
 
-use crate::utils::RwManager;
+use crate::utils::KeyFileManager;
 
 
 pub struct KeyManager;
 
-impl RwManager for KeyManager {
+impl KeyManager {
+    pub fn new() -> KeyManager {
+        KeyManager
+    }
+}
+
+
+impl KeyFileManager for KeyManager {
     fn read_file(&self, path: &Path) -> Result<[u8; 32], io::Error> {
         if !path.is_file() {
             return Err(io::Error::from(io::ErrorKind::NotFound))
         }
         let mut key = [0u8; 32];
-        let mut fp = fs::File::open(path).expect("Failed open key file.");
+        let mut fp = fs::File::open(path)?;
         fp.read_exact(&mut key).expect("Failed read key.");
         Ok(key)
     }

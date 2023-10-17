@@ -1,7 +1,10 @@
 [package]
-name = "fortipass"
+name = "fortipass_core"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+name = "fortipass_core"
 
 [dependencies]
 rand = "0.8.5"
