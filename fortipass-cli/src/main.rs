@@ -38,6 +38,8 @@ fn main() {
 
             // Get password
             "1" => {
+                show_pass().expect("Failed show all keys.");
+
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
                 let site = input("\nSite: ").expect("Failed read stdin `keyname`");
 

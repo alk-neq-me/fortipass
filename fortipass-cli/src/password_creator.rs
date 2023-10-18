@@ -37,15 +37,18 @@ impl Creator for PasswordCreator {
 
         fp.read_to_end(&mut buffer)?;
 
-        let decrypted = manager.decrypt(&buffer).expect("Failed decrypt buffer.");
+        match manager.decrypt(&buffer) {
+            Ok(decrypted) => {
+                let content = String::from_utf8(decrypted).expect("Failed bytes extract.");
 
-        let content = String::from_utf8(decrypted).expect("Failed bytes extract.");
+                let username = content.split(":").collect::<Vec<&str>>()[0];
+                let password = content.split(":").collect::<Vec<&str>>()[1];
 
-        let username = content.split(":").collect::<Vec<&str>>()[0];
-        let password = content.split(":").collect::<Vec<&str>>()[1];
+                let pass = Password::new(filename, username, password);
 
-        let pass = Password::new(filename, username, password);
-
-        Ok(pass)
+                Ok(pass)
+            },
+            Err(_) => Err(io::Error::from(io::ErrorKind::InvalidData))
+        }
     }
 }
