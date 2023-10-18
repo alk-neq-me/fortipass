@@ -24,6 +24,9 @@ fn show_menu() {
 fn main() {
     let secrets_path = Path::new("./.secrets");
 
+    /// TODO: TUI
+    /// TODO: Permission file
+
     loop {
         screen_clean();
 
