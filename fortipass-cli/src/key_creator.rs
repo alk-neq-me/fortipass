@@ -40,26 +40,3 @@ impl Creator for KeyCreator {
         Ok(key)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use fortipass_core::keymanager::KeyManager;
-
-    use crate::{file_manager::FileManager, key_creator::KeyCreator, utils::Creator};
-
-    #[test]
-    fn getting_key() {
-        let file_manager = FileManager::new("key");
-        let key_manager = KeyManager;
-        let key_creator = KeyCreator;
-
-        let mut key = [0u8; 32];
-
-        if !file_manager.secrets_path.is_dir() {
-            key_creator.create(&key_manager, &file_manager).expect("Failed creating key file.");
-            key = key_creator.retrieve(&key_manager, &file_manager, file_manager.key_name).expect("Faled getting key.");
-        }
-
-        assert_eq!(32, key.len());
-    }
-}

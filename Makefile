@@ -4,6 +4,8 @@ build:
 run: build
 	sudo ./target/release/fortipass-cli
 
+test: build
+	cargo test
 
 clean:
 	cargo clean
