@@ -17,11 +17,14 @@ fn show_menu() {
     println!("[ 3 ] Generate new key");
     println!("[ 4 ] Show list keys");
     println!("[ 5 ] Show list passwords");
+    println!("[ 6 ] Delete key");
+    println!("[ 7 ] Delete password");
     println!("[ q ] Quit");
 }
 
 
 fn main() {
+    // TODO: Error fix
     // TODO: TUI
 
     loop {
@@ -85,6 +88,16 @@ fn main() {
             "5" => {
                 show_pass().expect("Failed show all keys.");
             },
+
+            // Delete key
+            "6" => {
+                println!("Not available yet!");
+            },
+
+            // Delete password
+            "7" => {
+                println!("Not available yet!");
+            }
 
             _ => continue
         }
