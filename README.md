@@ -1,8 +1,8 @@
 # FortiPass - A Rust-Based Password Manager
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/alk-neq-me/fortipass/blob/main/LICENSE)
 
-[![Demo](./doc/demo.gif)]
+![Demo](./doc/demo.gif)
 
 FortiPass is a secure and reliable password manager implemented in Rust. It provides a command-line interface (CLI) for managing your passwords with a strong focus on security and ease of use.
 
