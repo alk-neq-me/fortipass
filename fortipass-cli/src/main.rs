@@ -104,23 +104,37 @@ fn main() {
 
             // Delete key
             "6" => {
+                show_keys().expect("Failed show all keys.");
+
                 let keyname = input("\nKey: ").expect("Failed read stdin `key`");
+                let comfirm = input(&format!("Are you sure want to remove key `{}` [y/n]: ", keyname.trim())).expect("Failed read stdin `comfirm`");
                 let file_manager = FileManager::new(&keyname.trim());
 
-                match remove_file(&file_manager, keyname.trim().to_owned() + ".key") {
-                    Ok(_) => println!("\n[ Success ] key remove successfully `{}`", keyname.trim()),
-                    Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=keyname.trim() ,err=err.kind())
+                if comfirm.trim().to_lowercase() == "y" {
+                    match remove_file(&file_manager, keyname.trim().to_owned() + ".key") {
+                        Ok(_) => println!("\n[ Success ] key remove successfully `{}`", keyname.trim()),
+                        Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=keyname.trim() ,err=err.kind())
+                    }
+                } else {
+                    println!("cancled");
                 }
             },
 
             // Delete password
             "7" => {
+                show_pass().expect("Failed show all keys.");
+
                 let pass = input("\nPass: ").expect("Failed read stdin `pass`");
+                let comfirm = input(&format!("Are you sure want to remove password `{}` [y/n]: ", pass.trim())).expect("Failed read stdin `comfirm`");
                 let file_manager = FileManager::new(&pass.trim());
 
-                match remove_file(&file_manager, pass.trim().to_owned()) {
-                    Ok(_) => println!("\n[ Success ] password remove successfully `{}`", pass.trim()),
-                    Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=pass.trim() ,err=err.kind())
+                if comfirm.trim().to_lowercase() == "y" {
+                    match remove_file(&file_manager, pass.trim().to_owned()) {
+                        Ok(_) => println!("\n[ Success ] password remove successfully `{}`", pass.trim()),
+                        Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=pass.trim() ,err=err.kind())
+                    }
+                } else {
+                    println!("cancled");
                 }
             }
 
