@@ -8,13 +8,13 @@ use crate::utils::Encryption;
 
 
 
-pub struct PasswordManager<'a> {
-    pub key: &'a [u8],
+pub struct PasswordManager {
+    pub key: [u8; 32],
     pub value: Option<Password>
 }
 
-impl<'a> PasswordManager<'a> {
-    pub fn new(key: &'a [u8]) -> PasswordManager<'a> {
+impl PasswordManager {
+    pub fn new(key: [u8; 32]) -> PasswordManager {
         PasswordManager {
             key,
             value: None
@@ -23,7 +23,7 @@ impl<'a> PasswordManager<'a> {
 }
 
 
-impl<'a> PasswordManager<'a> {
+impl PasswordManager {
     pub fn read_data(&self, encrypted: &EncryptedPassword) -> Result<Password, SymmetricCipherError> {
         let username = String::from_utf8(self.decrypt(&encrypted.username)?).expect("Failed username extract.");
         let password = String::from_utf8(self.decrypt(&encrypted.password)?).expect("Failed password extract.");
@@ -48,9 +48,9 @@ impl<'a> PasswordManager<'a> {
 }
 
 
-impl<'a> Encryption for PasswordManager<'a> {
+impl Encryption for PasswordManager {
     fn encrypt(&self, data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
-        let mut encryptor = crypto::aes::cbc_encryptor(KeySize::KeySize256, self.key, &[0u8; 16], crypto::blockmodes::PkcsPadding);
+        let mut encryptor = crypto::aes::cbc_encryptor(KeySize::KeySize256, &self.key, &[0u8; 16], crypto::blockmodes::PkcsPadding);
 
         let mut final_result = Vec::new();
         let mut read_buffer = crypto::buffer::RefReadBuffer::new(data);
@@ -73,7 +73,7 @@ impl<'a> Encryption for PasswordManager<'a> {
     fn decrypt(&self, data: &[u8]) -> Result<Vec<u8>, SymmetricCipherError> {
         let mut decryptor = crypto::aes::cbc_decryptor(
             KeySize::KeySize256,
-            self.key, 
+            &self.key, 
             &[0u8; 16], 
             crypto::blockmodes::PkcsPadding
         );

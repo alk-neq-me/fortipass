@@ -13,7 +13,7 @@ mod tests {
         let key_manager = KeyManager::new();
         let key = key_manager.generate_key();
 
-        let pass_manager = PasswordManager::new(&key);
+        let pass_manager = PasswordManager::new(key);
 
         let content = b"hello, world!";
 
@@ -26,12 +26,13 @@ mod tests {
 
     #[test]
     fn read_key_file() {
-        let key_path = Path::new("../key.bin");
+        let key_path = Path::new("../.secrets/key");
 
         let key_manager = KeyManager::new();
+        key_manager.create_file(&key_path).unwrap();
         let key = key_manager.read_file(&key_path).unwrap();
 
-        let pass_manager = PasswordManager::new(&key);
+        let pass_manager = PasswordManager::new(key);
 
         let content = b"hello, world!";
 
@@ -44,12 +45,12 @@ mod tests {
 
     #[test]
     fn read_encrypted_data() {
-        let key_path = Path::new("../key.bin");
+        let key_path = Path::new("../.secrets/key");
 
         let key_manager = KeyManager::new();
         let key = key_manager.read_file(&key_path).unwrap();
 
-        let pass_manager = PasswordManager::new(&key);
+        let pass_manager = PasswordManager::new(key);
 
         let content = Password::new("facebook", "marco", "2004marco");
         let encrypted = pass_manager.set_password(&content).unwrap();
