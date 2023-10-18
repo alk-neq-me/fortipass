@@ -24,7 +24,6 @@ fn show_menu() {
 
 
 fn main() {
-    // TODO: Error fix
     // TODO: TUI
 
     loop {
@@ -44,29 +43,40 @@ fn main() {
 
                 // Retrieve key
                 let file_manager = FileManager::new(&keyname.trim());
-                let key = get_key_file(&file_manager, file_manager.key_name).expect("Failed getting key");
-                let pass_manager = PasswordManager::new(key);
+                match get_key_file(&file_manager, file_manager.key_name) {
+                    Ok(key) => {
+                        let pass_manager = PasswordManager::new(key);
 
-                // Get password
-                let pass = retrieve_password_file(&file_manager, &pass_manager, &site.trim()).expect("Failed retrieve pass");
-                println!("\nUsername: {}\nPassword: {}", pass.username, pass.password);
+                        // Get password
+                        match retrieve_password_file(&file_manager, &pass_manager, &site.trim()) {
+                            Ok(pass) => println!("\nUsername: {}\nPassword: {}", pass.username, pass.password),
+                            Err(err) => println!("[ Failed ] failed getting password `{}`: {}", site.trim(), err.kind())
+                        }
+                    },
+                    Err(err) => println!("[ Failed ] failed getting key `{}`: {}", keyname.trim(), err.kind())
+                }
             },
 
             // Set password
             "2" => {
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
                 let site = input("\nSite: ").expect("Failed read stdin `site`");
-                let username = input("\nUsername: ").expect("Failed read stdin `username`");
-                let pass = input("\nPassword: ").expect("Failed read stdin `password`");
+                let username = input("Username: ").expect("Failed read stdin `username`");
+                let pass = input("Password: ").expect("Failed read stdin `password`");
 
                 // Retrieve key
                 let file_manager = FileManager::new(&keyname.trim());
-                let key = get_key_file(&file_manager, file_manager.key_name).expect("Failed getting key");
-                let mut pass_manager = PasswordManager::new(key);
-
-                pass_manager.set_password(Password::new(&site.trim(), &username.trim(), &pass.trim()));
-
-                set_password_file(&file_manager, &pass_manager).expect("Failed creating pass file");
+                match get_key_file(&file_manager, file_manager.key_name) {
+                    Ok(key) => {
+                        let mut pass_manager = PasswordManager::new(key);
+                        pass_manager.set_password(Password::new(&site.trim(), &username.trim(), &pass.trim()));
+                        match set_password_file(&file_manager, &pass_manager) {
+                            Ok(_) => println!("[ Success ] set new password successfully `{}`", site.trim()),
+                            Err(err) => println!("[ Failed ] failed setting password `{}`: {}", site.trim(), err.kind())
+                        }
+                    },
+                    Err(err) => println!("[ Failed ] failed getting key`{}`: {}", keyname.trim(), err.kind())
+                }
             },
 
             // Generate new key
@@ -76,7 +86,10 @@ fn main() {
                 // set key name
                 let file_manager = FileManager::new(&keyname.trim());
 
-                generate_new_key_file(&file_manager).expect("Failed generating new key file.");
+                match generate_new_key_file(&file_manager) {
+                    Ok(_) => println!("\n[ Success ] generate new key successfully `{}`", keyname.trim()),
+                    Err(err) => println!("\n[ Failed ] failed generate new key `{key}`: {err}", key=keyname.trim() ,err=err.kind())
+                }
             },
 
             // Show list all keys
@@ -93,14 +106,22 @@ fn main() {
             "6" => {
                 let keyname = input("\nKey: ").expect("Failed read stdin `key`");
                 let file_manager = FileManager::new(&keyname.trim());
-                remove_file(&file_manager, keyname.trim().to_owned() + ".key").expect("Failed remove key");
+
+                match remove_file(&file_manager, keyname.trim().to_owned() + ".key") {
+                    Ok(_) => println!("\n[ Success ] key remove successfully `{}`", keyname.trim()),
+                    Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=keyname.trim() ,err=err.kind())
+                }
             },
 
             // Delete password
             "7" => {
                 let pass = input("\nPass: ").expect("Failed read stdin `pass`");
                 let file_manager = FileManager::new(&pass.trim());
-                remove_file(&file_manager, pass.trim().to_owned()).expect("Failed remove key");
+
+                match remove_file(&file_manager, pass.trim().to_owned()) {
+                    Ok(_) => println!("\n[ Success ] password remove successfully `{}`", pass.trim()),
+                    Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=pass.trim() ,err=err.kind())
+                }
             }
 
             _ => continue
