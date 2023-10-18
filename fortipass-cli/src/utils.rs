@@ -1,4 +1,6 @@
-use std::io;
+use std::os::unix::prelude::PermissionsExt;
+use std::path::Path;
+use std::{io, fs};
 use std::io::Write;
 use std::process::Command;
 
@@ -87,4 +89,16 @@ pub fn screen_clean() {
         Command::new("clear").status().unwrap();
     };
     println!("{BANNAR}");
+}
+
+
+pub fn set_owner_perm(path: &Path) -> io::Result<()> {
+    let info = fs::metadata(&path)?;
+    let mut perms = info.permissions();
+
+    perms.set_mode(0o400);  // dr--------
+
+    fs::set_permissions(&path, perms)?;
+
+    Ok(())
 }

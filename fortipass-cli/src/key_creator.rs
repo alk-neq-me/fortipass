@@ -22,7 +22,8 @@ impl Creator for KeyCreator {
 
         let key = manager.generate_key();
 
-        let mut buf = fs::File::create(path)?;
+        let mut buf = fs::File::create(&path)?;
+
         buf.write_all(&key)
     }
 

@@ -19,7 +19,8 @@ impl Creator for PasswordCreator {
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()> {
         match manager.value {
             Some(ref ctx) => {
-                let mut buf = fs::File::options().write(true).create_new(true).open(file_manager.secrets_path.join(&ctx.site))?;
+                let path = file_manager.secrets_path.join(&ctx.site);
+                let mut buf = fs::File::options().write(true).create_new(true).open(&path)?;
                 let encrypted = manager.encrypt_password(&ctx).expect("Failed encrypted data.");
 
                 buf.write_all(&encrypted)?;
