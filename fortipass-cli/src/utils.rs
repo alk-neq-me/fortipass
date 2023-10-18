@@ -140,3 +140,18 @@ pub fn show_keys() -> io::Result<()> {
 
     Ok(())
 }
+
+
+pub fn remove_file(
+    file_manager: &FileManager,
+    name: String
+) -> io::Result<()> {
+    let path = file_manager.secrets_path.join(name);
+
+    if !path.is_file() {
+        return Err(io::Error::from(io::ErrorKind::NotFound))
+    }
+
+    fs::remove_file(path)?;
+    Ok(())
+}

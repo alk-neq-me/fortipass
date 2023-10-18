@@ -1,6 +1,6 @@
 use fortipass_core::models::Password;
 use fortipass_core::passmanager::PasswordManager;
-use utils::{set_password_file, generate_new_key_file, screen_clean, show_keys, show_pass};
+use utils::{set_password_file, generate_new_key_file, screen_clean, show_keys, show_pass, remove_file};
 
 use crate::file_manager::FileManager;
 use crate::utils::{get_key_file, retrieve_password_file, input};
@@ -91,12 +91,16 @@ fn main() {
 
             // Delete key
             "6" => {
-                println!("Not available yet!");
+                let keyname = input("\nKey: ").expect("Failed read stdin `key`");
+                let file_manager = FileManager::new(&keyname.trim());
+                remove_file(&file_manager, keyname.trim().to_owned() + ".key").expect("Failed remove key");
             },
 
             // Delete password
             "7" => {
-                println!("Not available yet!");
+                let pass = input("\nPass: ").expect("Failed read stdin `pass`");
+                let file_manager = FileManager::new(&pass.trim());
+                remove_file(&file_manager, pass.trim().to_owned()).expect("Failed remove key");
             }
 
             _ => continue
