@@ -46,9 +46,9 @@ mod tests {
         let pass_manager = PasswordManager::new(key);
 
         let content = Password::new("facebook", "marco", "2004marco");
-        let encrypted = pass_manager.set_password(&content).unwrap();
+        let encrypted = pass_manager.encrypt_password(&content).unwrap();
 
-        let result = pass_manager.read_data(&encrypted).unwrap();
+        let result = pass_manager.read_data(&encrypted, &content.site).unwrap();
 
         assert_eq!(content.password, result.password);
     }

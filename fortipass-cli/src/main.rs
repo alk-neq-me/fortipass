@@ -1,31 +1,29 @@
-use std::{path::Path, io};
+use std::path::Path;
+
+use fortipass_core::passmanager::PasswordManager;
+
+use crate::file_manager::FileManager;
+use crate::utils::{get_key_file, retrieve_password_file};
 
 mod utils;
 mod file_manager;
 mod password_creator;
 mod key_creator;
 
-use file_manager::FileManager;
-use fortipass_core::{keymanager::KeyManager, passmanager::PasswordManager};
-use key_creator::KeyCreator;
-use password_creator::PasswordCreator;
-use utils::Creator;
-
-
-fn get_key(path: &Path) -> io::Result<[u8; 32]> {
-    let key_creator = KeyCreator;
-    key_creator.retrieve(&KeyManager, &FileManager::new(path), "key")
-}
-
-
-fn set_password(path: &Path, key: [u8; 32], site: &str) -> io::Result<()> {
-    let password_creator = PasswordCreator;
-    password_creator.create(&PasswordManager::new(key), &FileManager::new(path), "fb", Some("marco:some"))
-}
 
 
 fn main() {
-    let secrets_path = Path::new("../.secrets");
-    let key = get_key(&secrets_path).unwrap();
-    set_password(&secrets_path, key, "fb").unwrap();
+    let secrets_path = Path::new("./.secrets");
+    let file_manager = FileManager::new(secrets_path, "key");
+
+    let key = get_key_file(&file_manager, file_manager.key_name).expect("Failed getting key");
+    let pass_manager = PasswordManager::new(key);
+
+    // pass_manager.set_password(Password::new("ig", "marco", "pass123"));
+
+    // set_password_file(&file_manager, &pass_manager).expect("Failed setting password");
+
+    let pass = retrieve_password_file(&file_manager, &pass_manager, "ig").expect("Failed retrieve pass");
+
+    println!("{:?}", pass);
 }

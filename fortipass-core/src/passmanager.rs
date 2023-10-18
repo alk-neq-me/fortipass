@@ -2,7 +2,7 @@ use crypto::aes::KeySize;
 use crypto::buffer::{WriteBuffer, ReadBuffer, BufferResult};
 use crypto::symmetriccipher::SymmetricCipherError;
 
-use crate::models::{Password, EncryptedPassword};
+use crate::models::Password;
 use crate::utils::Encryption;
 
 
@@ -24,12 +24,13 @@ impl PasswordManager {
 
 
 impl PasswordManager {
-    pub fn read_data(&self, encrypted: &EncryptedPassword) -> Result<Password, SymmetricCipherError> {
-        let username = String::from_utf8(self.decrypt(&encrypted.username)?).expect("Failed username extract.");
-        let password = String::from_utf8(self.decrypt(&encrypted.password)?).expect("Failed password extract.");
+    pub fn read_data(&self, encrypted: &[u8], site: &str) -> Result<Password, SymmetricCipherError> {
+        let decrypted = String::from_utf8(self.decrypt(&encrypted)?).expect("Failed decrypted data.");
+        let username = decrypted.split(":").nth(0).expect("Username not found.");
+        let password = decrypted.split(":").nth(1).expect("Password not found.");
 
         let decrypted = Password::new(
-            &encrypted.site,
+            site,
             &username,
             &password
         );
@@ -37,13 +38,16 @@ impl PasswordManager {
         Ok(decrypted)
     }
 
-    pub fn set_password(&self, data: &Password) -> Result<EncryptedPassword, SymmetricCipherError> {
-        let username = self.encrypt(data.username.as_bytes())?;
-        let password = self.encrypt(data.password.as_bytes())?;
-
-        let encrypted = EncryptedPassword::new(&data.site, username, password);
+    pub fn encrypt_password(&self, data: &Password) -> Result<Vec<u8>, SymmetricCipherError> {
+        let data = format!("{}:{}", data.username, data.password);
+        let encrypted = self.encrypt(data.as_bytes())?;
 
         Ok(encrypted)
+    }
+
+
+    pub fn set_password(&mut self, data: Password) {
+        self.value = Some(data)
     }
 }
 
