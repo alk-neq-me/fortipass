@@ -43,15 +43,13 @@ impl Creator for KeyCreator {
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
     use fortipass_core::keymanager::KeyManager;
 
     use crate::{file_manager::FileManager, key_creator::KeyCreator, utils::Creator};
 
     #[test]
     fn getting_key() {
-        let file_manager = FileManager::new(&Path::new("../.secrets"), "key");
+        let file_manager = FileManager::new("key");
         let key_manager = KeyManager;
         let key_creator = KeyCreator;
 

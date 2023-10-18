@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use fortipass_core::models::Password;
 use fortipass_core::passmanager::PasswordManager;
 use utils::{set_password_file, generate_new_key_file, screen_clean};
@@ -22,8 +20,6 @@ fn show_menu() {
 
 
 fn main() {
-    let secrets_path = Path::new("./.secrets");
-
     // TODO: TUI
 
     loop {
@@ -42,7 +38,7 @@ fn main() {
                 let site = input("\nSite: ").expect("Failed read stdin `keyname`");
 
                 // Retrieve key
-                let file_manager = FileManager::new(secrets_path, &keyname.trim());
+                let file_manager = FileManager::new(&keyname.trim());
                 let key = get_key_file(&file_manager, file_manager.key_name).expect("Failed getting key");
                 let pass_manager = PasswordManager::new(key);
 
@@ -62,7 +58,7 @@ fn main() {
                 let pass = input("\nPassword: ").expect("Failed read stdin `password`");
 
                 // Retrieve key
-                let file_manager = FileManager::new(secrets_path, &keyname.trim());
+                let file_manager = FileManager::new(&keyname.trim());
                 let key = get_key_file(&file_manager, file_manager.key_name).expect("Failed getting key");
                 let mut pass_manager = PasswordManager::new(key);
 
@@ -79,7 +75,7 @@ fn main() {
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
 
                 // set key name
-                let file_manager = FileManager::new(secrets_path, &keyname.trim());
+                let file_manager = FileManager::new(&keyname.trim());
 
                 generate_new_key_file(&file_manager).expect("Failed generating new key file.");
 

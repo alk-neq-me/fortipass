@@ -10,7 +10,8 @@ pub struct FileManager<'a> {
 }
 
 impl<'a> FileManager<'a> {
-    pub fn new(path: &'a Path, key_name: &'a str) -> FileManager<'a> {
+    pub fn new(key_name: &'a str) -> FileManager<'a> {
+        let path = Path::new("~/.secrets");
         if !path.is_dir() {
             fs::create_dir(path).expect("Failed create secrets dir.");
         }
