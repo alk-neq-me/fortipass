@@ -15,6 +15,8 @@ fn show_menu() {
     println!("[ 1 ] Get password");
     println!("[ 2 ] Set password");
     println!("[ 3 ] Generate new key");
+    println!("[ 4 ] Show list keys");
+    println!("[ 5 ] Show list passwords");
     println!("[ q ] Quit");
 }
 
@@ -82,6 +84,13 @@ fn main() {
                 // Continue
                 let _ = input("Pass `Enter` to continue.").expect("Failed continue Key");
             },
+
+            // Show list all keys
+            "4" => {},
+
+            // Show list all passwords
+            "5" => {},
+
             _ => continue
         }
     }
