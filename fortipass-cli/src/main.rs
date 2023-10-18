@@ -1,6 +1,6 @@
 use fortipass_core::models::Password;
 use fortipass_core::passmanager::PasswordManager;
-use utils::{set_password_file, generate_new_key_file, screen_clean};
+use utils::{set_password_file, generate_new_key_file, screen_clean, show_keys, show_pass};
 
 use crate::file_manager::FileManager;
 use crate::utils::{get_key_file, retrieve_password_file, input};
@@ -47,9 +47,6 @@ fn main() {
                 // Get password
                 let pass = retrieve_password_file(&file_manager, &pass_manager, &site.trim()).expect("Failed retrieve pass");
                 println!("\nUsername: {}\nPassword: {}", pass.username, pass.password);
-
-                // Continue
-                let _ = input("Pass `Enter` to continue.").expect("Failed continue Key");
             },
 
             // Set password
@@ -67,9 +64,6 @@ fn main() {
                 pass_manager.set_password(Password::new(&site.trim(), &username.trim(), &pass.trim()));
 
                 set_password_file(&file_manager, &pass_manager).expect("Failed creating pass file");
-
-                // Continue
-                let _ = input("Pass `Enter` to continue.").expect("Failed continue Key");
             },
 
             // Generate new key
@@ -80,18 +74,22 @@ fn main() {
                 let file_manager = FileManager::new(&keyname.trim());
 
                 generate_new_key_file(&file_manager).expect("Failed generating new key file.");
-
-                // Continue
-                let _ = input("Pass `Enter` to continue.").expect("Failed continue Key");
             },
 
             // Show list all keys
-            "4" => {},
+            "4" => {
+                show_keys().expect("Failed show all keys.");
+            },
 
             // Show list all passwords
-            "5" => {},
+            "5" => {
+                show_pass().expect("Failed show all keys.");
+            },
 
             _ => continue
         }
+
+        // Continue
+        let _ = input("\nPass `Enter` to continue.").expect("Failed continue Key");
     }
 }

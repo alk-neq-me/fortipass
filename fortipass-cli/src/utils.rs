@@ -102,3 +102,41 @@ pub fn set_owner_perm(path: &Path) -> io::Result<()> {
 
     Ok(())
 }
+
+
+pub fn show_pass() -> io::Result<()> {
+    let entiries = fs::read_dir("/etc/fortipass/.secrets")?;
+
+    for entry in entiries {
+        let entry = entry?;
+
+        if entry.file_type()?.is_file() {
+            if let Some(name) = entry.file_name().to_str() {
+                if !name.ends_with(".key") {
+                    println!("🔒 {}", name);
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+
+pub fn show_keys() -> io::Result<()> {
+    let entiries = fs::read_dir("/etc/fortipass/.secrets")?;
+
+    for entry in entiries {
+        let entry = entry?;
+
+        if entry.file_type()?.is_file() {
+            if let Some(name) = entry.file_name().to_str() {
+                if name.ends_with(".key") {
+                    println!("🔑 {}", name);
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
