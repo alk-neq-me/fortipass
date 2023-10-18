@@ -14,7 +14,7 @@ impl Creator for KeyCreator {
     type Return = [u8; 32];
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()> {
-        let path = file_manager.secrets_path.join(file_manager.key_name);
+        let path = file_manager.secrets_path.join(file_manager.key_name).with_extension("key");
 
         if path.is_file() {
             return Err(io::Error::from(io::ErrorKind::AlreadyExists))
@@ -22,12 +22,13 @@ impl Creator for KeyCreator {
 
         let key = manager.generate_key();
 
-        let mut buf = fs::File::create(path)?;
+        let mut buf = fs::File::create(&path)?;
+
         buf.write_all(&key)
     }
 
     fn retrieve(&self, _: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return> {
-        let path = file_manager.secrets_path.join(filename);
+        let path = file_manager.secrets_path.join(filename).with_extension("key");
 
         if !path.is_file() {
             return Err(io::Error::from(io::ErrorKind::NotFound))
@@ -42,15 +43,13 @@ impl Creator for KeyCreator {
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
     use fortipass_core::keymanager::KeyManager;
 
     use crate::{file_manager::FileManager, key_creator::KeyCreator, utils::Creator};
 
     #[test]
     fn getting_key() {
-        let file_manager = FileManager::new(&Path::new("../.secrets"), "key");
+        let file_manager = FileManager::new("key");
         let key_manager = KeyManager;
         let key_creator = KeyCreator;
 
