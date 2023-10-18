@@ -55,7 +55,7 @@ fn main() {
             // Set password
             "2" => {
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
-                let site = input("\nKeyname: ").expect("Failed read stdin `site`");
+                let site = input("\nSite: ").expect("Failed read stdin `site`");
                 let username = input("\nUsername: ").expect("Failed read stdin `username`");
                 let pass = input("\nPassword: ").expect("Failed read stdin `password`");
 

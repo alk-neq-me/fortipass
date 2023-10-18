@@ -11,9 +11,9 @@ pub struct FileManager<'a> {
 
 impl<'a> FileManager<'a> {
     pub fn new(key_name: &'a str) -> FileManager<'a> {
-        let path = Path::new("~/.secrets");
+        let path = Path::new("/etc/fortipass/.secrets");
         if !path.is_dir() {
-            fs::create_dir(path).expect("Failed create secrets dir.");
+            fs::create_dir_all(path).expect("Failed create secrets dir.");
         }
         set_owner_perm(&path).expect("Failed set permission");
         FileManager { secrets_path: path, key_name }
