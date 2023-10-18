@@ -1,7 +1,7 @@
-use std::io;
+use std::io::{Write, Read};
+use std::{io, fs};
 
 use fortipass_core::keymanager::KeyManager;
-use fortipass_core::utils::KeyFileManager;
 
 use crate::file_manager::FileManager;
 use crate::utils::Creator;
@@ -15,15 +15,23 @@ impl Creator for KeyCreator {
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager, filename: &str, _: Option<&str>) -> io::Result<()> {
         let path = file_manager.secrets_path.join(filename);
-        manager.create_file(&path)?;
+        let key = manager.generate_key();
 
-        Ok(())
+        let mut buf = fs::File::create(path)?;
+        buf.write_all(&key)
     }
 
-    fn retrieve(&self, manager: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return> {
+    fn retrieve(&self, _: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return> {
         let path = file_manager.secrets_path.join(filename);
 
-        manager.read_file(&path)
+        if !path.is_file() {
+            return Err(io::Error::from(io::ErrorKind::NotFound))
+        }
+
+        let mut key = [0u8; 32];
+        let mut buf = fs::File::open(path)?;
+        buf.read_exact(&mut key).expect("Failed read key.");
+        Ok(key)
     }
 }
 

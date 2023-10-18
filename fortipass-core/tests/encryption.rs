@@ -1,11 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
     use fortipass_core::keymanager::KeyManager;
     use fortipass_core::models::Password;
     use fortipass_core::passmanager::PasswordManager;
-    use fortipass_core::utils::{Encryption, KeyFileManager};
+    use fortipass_core::utils::Encryption;
 
 
     #[test]
@@ -25,12 +23,9 @@ mod tests {
 
 
     #[test]
-    fn read_key_file() {
-        let key_path = Path::new("../.secrets/key");
-
+    fn encrypt_decrypt_content() {
         let key_manager = KeyManager::new();
-        key_manager.create_file(&key_path).unwrap();
-        let key = key_manager.read_file(&key_path).unwrap();
+        let key = key_manager.generate_key();
 
         let pass_manager = PasswordManager::new(key);
 
@@ -45,10 +40,8 @@ mod tests {
 
     #[test]
     fn read_encrypted_data() {
-        let key_path = Path::new("../.secrets/key");
-
         let key_manager = KeyManager::new();
-        let key = key_manager.read_file(&key_path).unwrap();
+        let key = key_manager.generate_key();
 
         let pass_manager = PasswordManager::new(key);
 
