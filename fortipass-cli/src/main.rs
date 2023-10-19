@@ -24,6 +24,8 @@ fn show_menu() {
 
 
 fn main() {
+    let mut file_manager = FileManager::new();
+
     // TODO: TUI
 
     loop {
@@ -32,6 +34,10 @@ fn main() {
         show_menu();
 
         let inp = input("\nInput: ").expect("Failed read stdin `input`");
+
+        if !file_manager.key_name.is_empty() {
+            println!("Recent key: {}", file_manager.key_name);
+        }
 
         match inp.trim() {
             "q" => break,
@@ -46,8 +52,8 @@ fn main() {
                 let site = input("\nSite: ").expect("Failed read stdin `keyname`");
 
                 // Retrieve key
-                let file_manager = FileManager::new(&keyname.trim());
-                match get_key_file(&file_manager, file_manager.key_name) {
+                file_manager.set_key(keyname.trim().to_owned());
+                match get_key_file(&file_manager, &file_manager.key_name) {
                     Ok(key) => {
                         let pass_manager = PasswordManager::new(key);
 
@@ -69,8 +75,8 @@ fn main() {
                 let pass = input("Password: ").expect("Failed read stdin `password`");
 
                 // Retrieve key
-                let file_manager = FileManager::new(&keyname.trim());
-                match get_key_file(&file_manager, file_manager.key_name) {
+                file_manager.set_key(keyname.trim().to_owned());
+                match get_key_file(&file_manager, &file_manager.key_name) {
                     Ok(key) => {
                         let mut pass_manager = PasswordManager::new(key);
                         pass_manager.set_password(Password::new(&site.trim(), &username.trim(), &pass.trim()));
@@ -88,7 +94,7 @@ fn main() {
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
 
                 // set key name
-                let file_manager = FileManager::new(&keyname.trim());
+                file_manager.set_key(keyname.trim().to_owned());
 
                 match generate_new_key_file(&file_manager) {
                     Ok(_) => println!("\n[ Success ] generate new key successfully `{}`", keyname.trim()),
@@ -118,7 +124,7 @@ fn main() {
 
                 let keyname = input("\nKey: ").expect("Failed read stdin `key`");
                 let comfirm = input(&format!("Are you sure want to remove key `{}` [y/n]: ", keyname.trim())).expect("Failed read stdin `comfirm`");
-                let file_manager = FileManager::new(&keyname.trim());
+                file_manager.set_key(keyname.trim().to_owned());
 
                 if comfirm.trim().to_lowercase() == "y" {
                     match remove_file(&file_manager, keyname.trim().to_owned() + ".key") {
@@ -138,7 +144,6 @@ fn main() {
 
                 let pass = input("\nPass: ").expect("Failed read stdin `pass`");
                 let comfirm = input(&format!("Are you sure want to remove password `{}` [y/n]: ", pass.trim())).expect("Failed read stdin `comfirm`");
-                let file_manager = FileManager::new(&pass.trim());
 
                 if comfirm.trim().to_lowercase() == "y" {
                     match remove_file(&file_manager, pass.trim().to_owned()) {
