@@ -40,7 +40,7 @@ fn main() {
         let inp = input("\nInput: ").expect("Failed read stdin `input`");
 
         if !file_manager.key_name.is_empty() {
-            println!("Selected key: {}", file_manager.key_name);
+            println!("Selected key: 🔑 {}", file_manager.key_name);
         }
 
         match inp.trim() {
@@ -169,11 +169,11 @@ fn main() {
 
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
 
-                let path = Path::new(&file_manager.secrets_path).join(&keyname);
+                let path = Path::new(&file_manager.secrets_path).join(&keyname).with_extension("key");
 
                 if path.is_file() {
                     file_manager.set_key(keyname.trim().to_owned());
-                    println!("[ Success ] key `{}` selected successfully", keyname);
+                    println!("[ Success ] key 🔑 `{}` selected successfully", keyname);
                 } else {
                     println!("[ Failed ] failed select key: Key not found");
                 }
