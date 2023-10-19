@@ -38,7 +38,9 @@ fn main() {
 
             // Get password
             "1" => {
-                show_pass().expect("Failed show all keys.");
+                if let Err(err) = show_pass() {
+                    println!("[ Failed ] failed show all passwords: {}", err.kind());
+                }
 
                 let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
                 let site = input("\nSite: ").expect("Failed read stdin `keyname`");
@@ -96,17 +98,23 @@ fn main() {
 
             // Show list all keys
             "4" => {
-                show_keys().expect("Failed show all keys.");
+                if let Err(err) = show_keys() {
+                    println!("[ Failed ] failed show all keys: {}", err.kind());
+                }
             },
 
             // Show list all passwords
             "5" => {
-                show_pass().expect("Failed show all keys.");
+                if let Err(err) = show_pass() {
+                    println!("[ Failed ] failed show all passwords: {}", err.kind());
+                }
             },
 
             // Delete key
             "6" => {
-                show_keys().expect("Failed show all keys.");
+                if let Err(err) = show_keys() {
+                    println!("[ Failed ] failed show all keys: {}", err.kind());
+                }
 
                 let keyname = input("\nKey: ").expect("Failed read stdin `key`");
                 let comfirm = input(&format!("Are you sure want to remove key `{}` [y/n]: ", keyname.trim())).expect("Failed read stdin `comfirm`");
@@ -124,7 +132,9 @@ fn main() {
 
             // Delete password
             "7" => {
-                show_pass().expect("Failed show all keys.");
+                if let Err(err) = show_pass() {
+                    println!("[ Failed ] failed show all passwords: {}", err.kind());
+                }
 
                 let pass = input("\nPass: ").expect("Failed read stdin `pass`");
                 let comfirm = input(&format!("Are you sure want to remove password `{}` [y/n]: ", pass.trim())).expect("Failed read stdin `comfirm`");
