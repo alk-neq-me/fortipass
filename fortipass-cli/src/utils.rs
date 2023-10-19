@@ -27,20 +27,16 @@ const BANNAR: &str = r#"
 
 pub trait Creator {
     type Manager;
-    type Return;
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()>;
-
-    fn retrieve(&self, manager: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return>;
 }
 
 
 pub fn get_key_file(
     file_manager: &FileManager,
-    filename: &str
 ) -> io::Result<[u8; 32]> {
     let key_creator = KeyCreator;
-    key_creator.retrieve(&KeyManager, file_manager, filename)
+    key_creator.retrieve(file_manager)
 }
 
 
@@ -153,5 +149,47 @@ pub fn remove_file(
     }
 
     fs::remove_file(path)?;
+    Ok(())
+}
+
+
+pub fn initial_add_passwords(
+    file_manager: &FileManager,
+) -> io::Result<()> {
+    let initial = vec![
+        Password::new("rapidapi", "toyko2001", "..."),
+        Password::new("Google", "yuujunlee", "20justme->google::yuujunlee01"),
+        Password::new("Google", "toyko2001", "justme->google::toyko01"),
+        Password::new("Binance", "toyko2001", "20justme->Binance01"),
+        Password::new("Payple", "cocolwin", "20justme->Payple01"),
+        Password::new("Samsung", "toyko2001", "20alk!=me01"),
+        Password::new("iPhone", "aungkokolwin1990", "20my!=other;me=me->iCloud01"),
+        Password::new("Xiaomi", "6577665599", "Lwin12345"),
+        Password::new("Facebook", "marco.exexx", "20justme->facebook::marco01"),
+        Password::new("Twitch", "yoonjun", "20justme->facebook::yoonjun01"),
+        Password::new("Pinterest", "toyko2001", "20pinterest01"),
+        Password::new("Kakao", "toyko2001", "20justme->kakao::yujun01"),
+        Password::new("Careerly", "kakao", "..."),
+        Password::new("Mediafier", "toyko2001", "20mediafire01"),
+        Password::new("Yoteshinportal.cc", "toyko2001", "..."),
+        Password::new("Meganz", "toyko2001", "20meganz01"),
+        Password::new("Protovpn", "toyko2001", "20protovpn01"),
+        Password::new("Zenmate", "toyko2001", "20$zenmate=>$VPN01"),
+        Password::new("Lifetime", "toyko2001", "20lifetimevpn01"),
+        Password::new("Minecraft", "toyko2001", "20minecraft01"),
+        Password::new("webshare.io", "toyko2001", "..."),
+        Password::new("Expo", "marco.exexx", "20jutme->expo::marco01"),
+        Password::new("Github", "toyko2001", "..."),
+        Password::new("AWS", "toyko2001", "20my!=other;me=me->AWS01"),
+    ];
+
+    let mut pass_manager = PasswordManager::new(get_key_file(&file_manager)?);
+    let password_creator = PasswordCreator;
+
+    for pass in initial.into_iter() {
+        pass_manager.set_password(pass);
+        password_creator.create(&pass_manager, &file_manager)?;
+    }
+
     Ok(())
 }
