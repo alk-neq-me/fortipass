@@ -14,7 +14,7 @@ impl Creator for KeyCreator {
     type Return = [u8; 32];
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()> {
-        let path = file_manager.secrets_path.join(file_manager.key_name).with_extension("key");
+        let path = file_manager.secrets_path.join(&file_manager.key_name).with_extension("key");
 
         if path.is_file() {
             return Err(io::Error::from(io::ErrorKind::AlreadyExists))
@@ -27,8 +27,8 @@ impl Creator for KeyCreator {
         buf.write_all(&key)
     }
 
-    fn retrieve(&self, _: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return> {
-        let path = file_manager.secrets_path.join(filename).with_extension("key");
+    fn retrieve(&self, _: &Self::Manager, file_manager: &FileManager, _: &str) -> io::Result<Self::Return> {
+        let path = file_manager.secrets_path.join(&file_manager.key_name).with_extension("key");
 
         if !path.is_file() {
             return Err(io::Error::from(io::ErrorKind::NotFound))
