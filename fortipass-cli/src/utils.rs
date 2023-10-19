@@ -27,20 +27,16 @@ const BANNAR: &str = r#"
 
 pub trait Creator {
     type Manager;
-    type Return;
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()>;
-
-    fn retrieve(&self, manager: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return>;
 }
 
 
 pub fn get_key_file(
     file_manager: &FileManager,
-    filename: &str
 ) -> io::Result<[u8; 32]> {
     let key_creator = KeyCreator;
-    key_creator.retrieve(&KeyManager, file_manager, filename)
+    key_creator.retrieve(file_manager)
 }
 
 
@@ -153,5 +149,24 @@ pub fn remove_file(
     }
 
     fs::remove_file(path)?;
+    Ok(())
+}
+
+
+pub fn initial_add_passwords(
+    file_manager: &FileManager,
+) -> io::Result<()> {
+    let initial = vec![
+        Password::new("sitename", "username", "password"),
+    ];
+
+    let mut pass_manager = PasswordManager::new(get_key_file(&file_manager)?);
+    let password_creator = PasswordCreator;
+
+    for pass in initial.into_iter() {
+        pass_manager.set_password(pass);
+        password_creator.create(&pass_manager, &file_manager)?;
+    }
+
     Ok(())
 }

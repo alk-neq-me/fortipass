@@ -11,7 +11,6 @@ pub struct KeyCreator;
 
 impl Creator for KeyCreator {
     type Manager = KeyManager;
-    type Return = [u8; 32];
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()> {
         let path = file_manager.secrets_path.join(&file_manager.key_name).with_extension("key");
@@ -26,8 +25,11 @@ impl Creator for KeyCreator {
 
         buf.write_all(&key)
     }
+}
 
-    fn retrieve(&self, _: &Self::Manager, file_manager: &FileManager, _: &str) -> io::Result<Self::Return> {
+
+impl KeyCreator {
+    pub fn retrieve(&self, file_manager: &FileManager) -> io::Result<[u8; 32]> {
         let path = file_manager.secrets_path.join(&file_manager.key_name).with_extension("key");
 
         if !path.is_file() {

@@ -14,9 +14,9 @@ pub struct PasswordCreator;
 
 impl Creator for PasswordCreator {
     type Manager = PasswordManager;
-    type Return = Password;
 
     fn create(&self, manager: &Self::Manager, file_manager: &FileManager) -> io::Result<()> {
+        println!("Creating...");
         match manager.value {
             Some(ref ctx) => {
                 let path = file_manager.secrets_path.join(&ctx.site);
@@ -30,8 +30,11 @@ impl Creator for PasswordCreator {
 
         Ok(())
     }
+}
 
-    fn retrieve(&self, manager: &Self::Manager, file_manager: &FileManager, filename: &str) -> io::Result<Self::Return> {
+
+impl PasswordCreator {
+    pub fn retrieve(&self, manager: &PasswordManager, file_manager: &FileManager, filename: &str) -> io::Result<Password> {
         let mut fp = fs::File::open(file_manager.secrets_path.join(filename))?;
         let mut buffer = Vec::new();
 
