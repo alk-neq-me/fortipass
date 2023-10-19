@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use fortipass_core::models::Password;
 use fortipass_core::passmanager::PasswordManager;
 use utils::{set_password_file, generate_new_key_file, screen_clean, show_keys, show_pass, remove_file, initial_add_passwords};
@@ -20,6 +22,7 @@ fn show_menu() {
     println!("[ 6 ] Delete key");
     println!("[ 7 ] Delete password");
     println!("[ 8 ] Initial add passwords");
+    println!("[ 9 ] Select key");
     println!("[ q ] Quit");
 }
 
@@ -38,9 +41,6 @@ fn main() {
 
         if !file_manager.key_name.is_empty() {
             println!("Selected key: {}", file_manager.key_name);
-        } else {
-            let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
-            file_manager.set_key(keyname.trim().to_owned());
         }
 
         match inp.trim() {
@@ -52,11 +52,10 @@ fn main() {
                     println!("[ Failed ] failed show all passwords: {}", err.kind());
                 }
 
-                let site = input("\nSite: ").expect("Failed read stdin `keyname`");
-
                 // Retrieve key
                 match get_key_file(&file_manager) {
                     Ok(key) => {
+                        let site = input("\nSite: ").expect("Failed read stdin `keyname`");
                         let pass_manager = PasswordManager::new(key);
 
                         // Get password
@@ -72,12 +71,13 @@ fn main() {
             // Set password
             "2" => {
                 let site = input("\nSite: ").expect("Failed read stdin `site`");
-                let username = input("Username: ").expect("Failed read stdin `username`");
-                let pass = input("Password: ").expect("Failed read stdin `password`");
 
                 // Retrieve key
                 match get_key_file(&file_manager) {
                     Ok(key) => {
+                        let username = input("Username: ").expect("Failed read stdin `username`");
+                        let pass = input("Password: ").expect("Failed read stdin `password`");
+
                         let mut pass_manager = PasswordManager::new(key);
                         pass_manager.set_password(Password::new(&site.trim(), &username.trim(), &pass.trim()));
                         match set_password_file(&file_manager, &pass_manager) {
@@ -148,7 +148,7 @@ fn main() {
                 if comfirm.trim().to_lowercase() == "y" {
                     match remove_file(&file_manager, pass.trim().to_owned()) {
                         Ok(_) => println!("\n[ Success ] password remove successfully `{}`", pass.trim()),
-                        Err(err) => println!("\n[ Failed ] failed remove key `{key}`: {err}", key=pass.trim() ,err=err.kind())
+                        Err(err) => println!("\n[ Failed ] failed remove password `{}`: {}", pass.trim(), err.kind())
                     }
                 } else {
                     println!("cancled");
@@ -160,7 +160,25 @@ fn main() {
                 if let Err(err) = initial_add_passwords(&file_manager) {
                     println!("[ Failed ] failed initial set passwords: {}", err.kind());
                 }
-            }
+            },
+
+            "9" => {
+                if let Err(err) = show_keys() {
+                    println!("[ Failed ] failed show all keys: {}", err.kind());
+                }
+
+                let keyname = input("\nKeyname: ").expect("Failed read stdin `keyname`");
+
+                let path = Path::new(&file_manager.secrets_path).join(&keyname);
+
+                if path.is_file() {
+                    file_manager.set_key(keyname.trim().to_owned());
+                    println!("[ Success ] key `{}` selected successfully", keyname);
+                } else {
+                    println!("[ Failed ] failed select key: Key not found");
+                }
+            },
+
             _ => continue
         }
 
