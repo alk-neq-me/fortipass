@@ -157,6 +157,7 @@ pub fn initial_add_passwords(
     file_manager: &FileManager,
 ) -> io::Result<()> {
     let initial = vec![
+<<<<<<< HEAD
         Password::new("rapidapi", "toyko2001", "..."),
         Password::new("Google", "yuujunlee", "20justme->google::yuujunlee01"),
         Password::new("Google", "toyko2001", "justme->google::toyko01"),
@@ -181,6 +182,9 @@ pub fn initial_add_passwords(
         Password::new("Expo", "marco.exexx", "20jutme->expo::marco01"),
         Password::new("Github", "toyko2001", "..."),
         Password::new("AWS", "toyko2001", "20my!=other;me=me->AWS01"),
+=======
+        Password::new("sitename", "username", "password"),
+>>>>>>> d2f23ab (fixed: git error)
     ];
 
     let mut pass_manager = PasswordManager::new(get_key_file(&file_manager)?);
