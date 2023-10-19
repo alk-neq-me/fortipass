@@ -15,7 +15,9 @@ impl<'a> FileManager<'a> {
         if !path.is_dir() {
             fs::create_dir_all(path).expect("Failed create secrets dir.");
         }
-        set_owner_perm(&path).expect("Failed set permission");
+        if let Err(err) = set_owner_perm(&path) {
+            println!("[ Faield ] failed set permission: {}", err.kind());
+        }
         FileManager { secrets_path: path, key_name }
     }
 }
