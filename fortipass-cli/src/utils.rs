@@ -100,8 +100,9 @@ pub fn set_owner_perm(path: &Path) -> io::Result<()> {
 }
 
 
-pub fn show_pass() -> io::Result<()> {
+pub fn show_pass() -> io::Result<Vec<String>> {
     let entiries = fs::read_dir("/etc/fortipass/.secrets")?;
+    let mut passes = Vec::new();
 
     for entry in entiries {
         let entry = entry?;
@@ -109,13 +110,13 @@ pub fn show_pass() -> io::Result<()> {
         if entry.file_type()?.is_file() {
             if let Some(name) = entry.file_name().to_str() {
                 if !name.ends_with(".key") {
-                    println!("🔒 {}", name);
+                    passes.push(String::from(name))
                 }
             }
         }
     }
 
-    Ok(())
+    Ok(passes)
 }
 
 
@@ -169,4 +170,20 @@ pub fn initial_add_passwords(
     }
 
     Ok(())
+}
+
+
+pub fn print_pass_file(
+    site: &str,
+    username: &str,
+    password: &str,
+    path: &Path
+) {
+    let mut fp = fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path).expect("Failed create pass file");
+
+    let data = format!("---\nsite: {site}\nusername: {username}\npassword: {password}\n");
+    fp.write_all(data.as_bytes()).expect("Failed write pass file");
 }

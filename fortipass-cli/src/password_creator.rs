@@ -4,7 +4,6 @@ use std::fs;
 
 use fortipass_core::passmanager::PasswordManager;
 use fortipass_core::models::Password;
-use fortipass_core::utils::Encryption;
 
 use crate::file_manager::FileManager;
 use crate::utils::Creator;
@@ -36,21 +35,12 @@ impl Creator for PasswordCreator {
 impl PasswordCreator {
     pub fn retrieve(&self, manager: &PasswordManager, file_manager: &FileManager, filename: &str) -> io::Result<Password> {
         let mut fp = fs::File::open(file_manager.secrets_path.join(filename))?;
-        let mut buffer = Vec::new();
+        let mut encrypted = Vec::new();
 
-        fp.read_to_end(&mut buffer)?;
+        fp.read_to_end(&mut encrypted)?;
 
-        match manager.decrypt(&buffer) {
-            Ok(decrypted) => {
-                let content = String::from_utf8(decrypted).expect("Failed bytes extract.");
-
-                let username = content.split(":").collect::<Vec<&str>>()[0];
-                let password = content.split(":").collect::<Vec<&str>>()[1];
-
-                let pass = Password::new(filename, username, password);
-
-                Ok(pass)
-            },
+        match manager.read_data(&encrypted, filename) {
+            Ok(password) => Ok(password),
             Err(_) => Err(io::Error::from(io::ErrorKind::InvalidData))
         }
     }

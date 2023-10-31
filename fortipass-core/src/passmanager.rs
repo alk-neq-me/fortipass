@@ -28,6 +28,8 @@ impl PasswordManager {
         let decrypted = String::from_utf8(self.decrypt(&encrypted)?).expect("Failed decrypted data.");
         let username = decrypted.split(":").nth(0).expect("Username not found.");
         let password = decrypted.split(":").nth(1).expect("Password not found.");
+        // let username = decrypted.split(":fortipass:").nth(0).expect("Username not found.");
+        // let password = decrypted.split(":fortipass:").nth(1).expect("Password not found.");
 
         let decrypted = Password::new(
             site,
@@ -39,7 +41,7 @@ impl PasswordManager {
     }
 
     pub fn encrypt_password(&self, data: &Password) -> Result<Vec<u8>, SymmetricCipherError> {
-        let data = format!("{}:{}", data.username, data.password);
+        let data = format!("{}:fortipass:{}", data.username, data.password);
         let encrypted = self.encrypt(data.as_bytes())?;
 
         Ok(encrypted)

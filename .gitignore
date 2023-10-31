@@ -2,6 +2,7 @@ target/
 Cargo.lock
 
 .secrets
+*.ignore*
 
 .vscode/
 .idea/
